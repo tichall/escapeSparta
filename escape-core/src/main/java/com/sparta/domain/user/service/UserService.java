@@ -21,76 +21,91 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
-    private final EmailService emailService;
-    private final RefreshTokenService refreshTokenService;
+  private final PasswordEncoder passwordEncoder;
+  private final UserRepository userRepository;
+  private final EmailService emailService;
+  private final RefreshTokenService refreshTokenService;
 
-    @Value("${admin.key}")
-    private String adminKey;
+  @Value("${admin.key}")
+  private String adminKey;
 
-    /**
-     * 회원가입
-     *
-     * @param requestDto 회원가입 요청 데이터를 담은 Dto
-     * @return 회원가입된 사용자의 정보를 담은 Dto
-     * @throws UserException 유저 중복 예외처리
-     */
-    @Transactional
-    public SignupResponseDto createUser(SignupRequestDto requestDto) {
+  /**
+   * 회원가입 메서드
+   *
+   * @param requestDto 회원가입 요청 데이터를 담은 Dto
+   * @return 회원가입된 사용자의 정보를 담은 Dto
+   * @throws UserException 유저 중복 예외처리
+   */
+  @Transactional
+  public SignupResponseDto createUser(SignupRequestDto requestDto) {
 
-        // 이메일로 유저 중복검사
-        userRepository.throwIfEmailExists(requestDto.getEmail());
+    // 이메일로 유저 중복검사
+    userRepository.throwIfEmailExists(requestDto.getEmail());
 
-        // 인증 코드로 회원가입할 Role 체크
-        UserType userType = emailService.determineUserTypeFromCertificateCode(requestDto.getCertificateCode());
+    // 인증 코드로 회원가입할 Role 체크
+    UserType userType = emailService.determineUserTypeFromCertificateCode(
+        requestDto.getCertificateCode());
 
-        // 이메일 인증
-        emailService.verifyEmail(requestDto.getEmail(), requestDto.getCertificateCode());
+    // 이메일 인증
+    emailService.verifyEmail(requestDto.getEmail(), requestDto.getCertificateCode());
 
-        if(userType == UserType.ADMIN) {
-            if(!requestDto.getAdminKey().equals(adminKey)) {
-                throw new UserException(UserErrorCode.INVALID_ADMIN_KEY);
-            }
-        }
-
-        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
-
-        User user = new User(
-                requestDto.getName(),
-                requestDto.getEmail(),
-                encodedPassword,
-                OAuthProvider.ORIGIN,
-                userType,
-                UserStatus.ACTIVE
-        );
-
-        userRepository.save(user);
-        return new SignupResponseDto(user);
+    if (userType == UserType.ADMIN) {
+      if (!requestDto.getAdminKey().equals(adminKey)) {
+        throw new UserException(UserErrorCode.INVALID_ADMIN_KEY);
+      }
     }
 
-    @Transactional(readOnly = true)
-    public Long logout(Long userId) {
+    String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
-        User user = userRepository.findByIdOrElseThrow(userId);
-        refreshTokenService.deleteRefreshTokenInfo(user.getEmail());
+    User user = new User(
+        requestDto.getName(),
+        requestDto.getEmail(),
+        encodedPassword,
+        OAuthProvider.ORIGIN,
+        userType,
+        UserStatus.ACTIVE
+    );
 
-        return user.getId();
+    userRepository.save(user);
+    return new SignupResponseDto(user);
+  }
+
+  /**
+   * 로그아웃 메서드
+   *
+   * @param userId 사용자 ID
+   * @return 로그아웃된 사용자 ID
+   */
+  @Transactional(readOnly = true)
+  public Long logout(Long userId) {
+
+    User user = userRepository.findByIdOrElseThrow(userId);
+    refreshTokenService.deleteRefreshTokenInfo(user.getEmail());
+
+    return user.getId();
+  }
+
+  /**
+   * 회원 탈퇴 메서드
+   *
+   * @param requestDto 회원 탈퇴 요청 데이터를 담은 DTO
+   * @param userId     사용자 ID
+   * @return 탈퇴된 사용자 ID
+   * @throws UserException 비밀번호 불일치 예외처리
+   */
+  @Transactional
+  public Long withdraw(WithdrawRequestDto requestDto, Long userId) {
+
+    User user = userRepository.findByIdOrElseThrow(userId);
+
+    if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+      throw new UserException(UserErrorCode.PASSWORD_NOT_MATCH);
     }
 
-    @Transactional
-    public Long withdraw(WithdrawRequestDto requestDto, Long userId) {
+    user.changeStatus(UserStatus.WITHDRAW);
+    userRepository.save(user);
+    refreshTokenService.deleteRefreshTokenInfo(user.getEmail());
 
-        User user = userRepository.findByIdOrElseThrow(userId);
-
-        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw new UserException(UserErrorCode.PASSWORD_NOT_MATCH);
-        }
-
-        user.changeStatus(UserStatus.WITHDRAW);
-        userRepository.save(user);
-        refreshTokenService.deleteRefreshTokenInfo(user.getEmail());
-
-        return user.getId();
-    }
+    return user.getId();
+  }
 }

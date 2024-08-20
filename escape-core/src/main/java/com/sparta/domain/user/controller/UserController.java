@@ -12,7 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -22,6 +26,12 @@ public class UserController {
 
   private final UserService userService;
 
+  /**
+   * 회원가입 메서드
+   *
+   * @param requestDto 회원가입 요청 정보를 담은 DTO
+   * @return 회원가입 결과에 대한 응답 메시지
+   */
   @PostMapping("/signup")
   public ResponseEntity<ResponseMessage<SignupResponseDto>> createUser(
       @Valid @RequestBody SignupRequestDto requestDto) {
@@ -36,6 +46,12 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
   }
 
+  /**
+   * 로그아웃 메서드
+   *
+   * @param userDetails 인증된 사용자 정보
+   * @return 로그아웃 결과에 대한 응답 메시지
+   */
   @PutMapping("/logout")
   public ResponseEntity<ResponseMessage<Long>> logout(
       @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -49,6 +65,13 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
   }
 
+  /**
+   * 회원 탈퇴 메서드
+   *
+   * @param withdrawRequestDto 회원 탈퇴 요청 정보를 담은 DTO
+   * @param userDetails        인증된 사용자 정보
+   * @return 회원 탈퇴 결과에 대한 응답 메시지
+   */
   @PutMapping("/withdraw")
   public ResponseEntity<ResponseMessage<Long>> withdraw(
       @Valid @RequestBody WithdrawRequestDto withdrawRequestDto,
