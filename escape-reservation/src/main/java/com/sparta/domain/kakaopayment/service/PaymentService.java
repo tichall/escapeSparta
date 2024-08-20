@@ -52,11 +52,11 @@ public class PaymentService {
     private String failURL; //결제완료
 
 
-    //단건결제
+    // 단건결제
     private static final String KAKAO_PAY_API_URL = "https://open-api.kakaopay.com/online/v1/payment/ready";
-    //주문조회
+    // 주문조회
     private static final String KAKAO_ORDER_API_URL = "https://open-api.kakaopay.com/online/v1/payment/order";
-    //결제취소
+    // 결제취소
     private static final String KAKAO_CANCEL_API_URL = "https://open-api.kakaopay.com/online/v1/payment/cancel";
 
 
@@ -163,10 +163,8 @@ public class PaymentService {
 
         Reservation reservation = payment.getReservation();
 
-        reservation.cancelReservationStatus();
-        ThemeTime themeTime = reservation.getThemeTime();
-        themeTime.updateThemeTimeStatus();
-        payment.refundPayment();
-    }
+    reservation.cancelReservation();
+    payment.refundPayment();
+  }
 
 }

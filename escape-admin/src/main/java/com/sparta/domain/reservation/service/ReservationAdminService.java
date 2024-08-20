@@ -14,22 +14,31 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ReservationAdminService {
-    private final ReservationRepository reservationRepository;
-    private final ThemeRepository themeRepository;
 
-    public ReservationsGetResponseDto getReservations(Long themeId) {
-        Theme theme = themeRepository.findThemeOfActiveStore(themeId);
+  private final ReservationRepository reservationRepository;
+  private final ThemeRepository themeRepository;
 
-        List<Reservation> reservationList = reservationRepository.findByTheme(theme);
-        return new ReservationsGetResponseDto(themeId, reservationList);
-    }
+  /**
+   * 해당 테마의 예약 내역 조회
+   *
+   * @param themeId 테마 id
+   * @return 예약 내역
+   */
+  public ReservationsGetResponseDto getReservations(Long themeId) {
+    Theme theme = themeRepository.findThemeOfActiveStore(themeId);
 
-    @Transactional
-    public void cancelReservation(Long reservationId) {
-        Reservation reservation = reservationRepository.findActiveReservation(reservationId);
+    List<Reservation> reservationList = reservationRepository.findByTheme(theme);
+    return new ReservationsGetResponseDto(themeId, reservationList);
+  }
 
-        // 환불 기능 추가 예정
-
-        reservation.updateReservationStatus();
-    }
+  /**
+   * 예약 강제 취소
+   *
+   * @param reservationId 예약 id
+   */
+  @Transactional
+  public void cancelReservation(Long reservationId) {
+    Reservation reservation = reservationRepository.findActiveReservation(reservationId);
+    reservation.cancelReservation();
+  }
 }

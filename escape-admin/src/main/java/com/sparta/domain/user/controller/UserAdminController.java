@@ -20,9 +20,9 @@ public class UserAdminController {
   private final UserAdminService userAdminService;
 
   /**
-   * 모든 Manager 조회
+   * 모든 Manger 정보 조회
    *
-   * @author SEMI
+   * @return status.code, message, Manger 정보 리스트 반환
    */
   @GetMapping("/managers")
   public ResponseEntity<ResponseMessage<List<UserResponseDto>>> getAllManagers() {
@@ -38,9 +38,9 @@ public class UserAdminController {
   }
 
   /**
-   * 모든 Consumer 조회
+   * 모든 Consumer 정보 조회
    *
-   * @author SEMI
+   * @return status.code, message, Consumer 정보 리스트 반환
    */
   @GetMapping("/consumers")
   public ResponseEntity<ResponseMessage<List<UserResponseDto>>> getAllConsumers() {
@@ -54,6 +54,4 @@ public class UserAdminController {
 
     return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
   }
-
-
 }

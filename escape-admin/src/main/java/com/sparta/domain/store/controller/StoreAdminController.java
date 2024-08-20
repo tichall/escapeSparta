@@ -23,11 +23,11 @@ public class StoreAdminController {
   private final StoreAdminService storeAdminService;
 
   /**
-   * 방탈출 카페 강제 등록 for Admin
+   * 방탈출 카페 강제 등록
    *
-   * @param requestDto
-   * @return StoreResponseDto : 방탈출 카페 정보
-   * @author SEMI
+   * @param file       카페 이미지 파일
+   * @param requestDto 등록할 카페 정보 Dto
+   * @return status.code, message, 등록한 카페 정보 반환
    */
   @PostMapping("/stores")
   public ResponseEntity<ResponseMessage<StoreDetailResponseDto>> createStoreByAdmin(
@@ -47,10 +47,9 @@ public class StoreAdminController {
   }
 
   /**
-   * 모든 방탈출 카페 조회 (모든상태: 대기중,활성화,비활성화 ) for Admin
+   * 모든 방탈출 카페 조회 (모든 상태: 대기중, 활성화, 비활성화)
    *
-   * @return List<StoreResponseDto> : 방탈출 카페 정보 리스트
-   * @author SEMI
+   * @return status.code, message, 조회한 모든 카페 리스트 반환
    */
   @GetMapping("/stores")
   public ResponseEntity<ResponseMessage<List<StoreResponseDto>>> getAllStore() {
@@ -65,12 +64,11 @@ public class StoreAdminController {
     return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
   }
 
-
   /**
-   * Admin이 방탈출 카페 등록 승인 ( PENDING -> ACTIVE )
+   * 방탈출 카페 등록 승인 ( PENDING -> ACTIVE )
    *
-   * @param storeId
-   * @author SEMI
+   * @param storeId 카페 id
+   * @return status.code, message
    */
   @PutMapping("/stores/{storeId}/approval")
   public ResponseEntity<ResponseMessage<Void>> approveStore(@Valid @PathVariable Long storeId) {
@@ -87,6 +85,10 @@ public class StoreAdminController {
 
   /**
    * 방탈출 카페 수정
+   *
+   * @param storeId    방탈출 카페 id
+   * @param requestDto 수정할 카페 정보 Dto
+   * @return status.code, message, 수정한 카페 정보 반환
    */
   @PutMapping("/{storeId}")
   public ResponseEntity<ResponseMessage<StoreDetailResponseDto>> modifyStore(
@@ -106,6 +108,10 @@ public class StoreAdminController {
 
   /**
    * 방탈출 카페 이미지 수정
+   *
+   * @param storeId 카페 id
+   * @param file    수정할 이미지 파일
+   * @return status.code, message, 수정한 이미지 경로 반환
    */
   @PutMapping("/{storeId}/image")
   public ResponseEntity<ResponseMessage<String>> modifyStoreImage(
@@ -125,6 +131,9 @@ public class StoreAdminController {
 
   /**
    * 방탈출 카페 이미지 삭제
+   *
+   * @param storeId 카페 id
+   * @return status.code, message
    */
   @DeleteMapping("/{storeId}/image")
   public ResponseEntity<ResponseMessage<Void>> deleteStoreImage(
@@ -142,6 +151,9 @@ public class StoreAdminController {
 
   /**
    * 방탈출 카페 삭제
+   *
+   * @param storeId 카페 id
+   * @return status.code, message
    */
   @DeleteMapping("/{storeId}")
   public ResponseEntity<ResponseMessage<Void>> deactivateStore(
@@ -158,10 +170,10 @@ public class StoreAdminController {
   }
 
   /**
-   * 방탈출 카페 완전 삭제 for Admin
+   * 방탈출 카페 완전 삭제
    *
-   * @param storeId
-   * @author SEMI
+   * @param storeId 카페 id
+   * @return status.code, message
    */
   @DeleteMapping
   public ResponseEntity<ResponseMessage<Void>> deleteStore(@Valid @RequestBody Long storeId) {
@@ -170,7 +182,7 @@ public class StoreAdminController {
 
     ResponseMessage<Void> responseMessage = ResponseMessage.<Void>builder()
         .statusCode(HttpStatus.OK.value())
-        .message("해당 방탈출카페가 삭제 되었습니다.")
+        .message("해당 방탈출 카페가 삭제 되었습니다.")
         .build();
 
     return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
