@@ -29,6 +29,12 @@ public class ReviewConsumerService {
     private final StoreRepository storeRepository;
     private final ConcurrentHashMap<String, CompletableFuture<List<ReviewResponseDto>>> responseFutures;
 
+
+    /**
+     * kafka consumer 리뷰 조회
+     *
+     * @param reviewRequest 조회할 리뷰에 대한 정보
+     */
     @KafkaListener(topics = KafkaTopic.REVIEW_REQUEST_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
     public void handleReviewRequest(KafkaReviewRequestDto reviewRequest) {
         try {

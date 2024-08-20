@@ -38,6 +38,11 @@ public class ThemeConsumerService {
     private final ConcurrentHashMap<String, CompletableFuture<ThemeInfoResponseDto>> responseThemeInfoFutures;
     private final ConcurrentHashMap<String, CompletableFuture<List<ThemeTimeResponseDto>>> responseThemeTimeFutures;
 
+    /**
+     * kafka consumer 테마 조회
+     *
+     * @param request 조회할 카페 테마 들의 페이징 정보
+     */
     @KafkaListener(topics = KafkaTopic.THEME_REQUEST_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
     public void handleThemeRequest(KafkaThemeRequestDto request) {
         try {
@@ -61,6 +66,11 @@ public class ThemeConsumerService {
         }
     }
 
+    /**
+     * kafka consumer 카페 테마 상세 조회
+     *
+     * @param request 상세 조회할 테마의 정보 값
+     */
     @KafkaListener(topics = KafkaTopic.THEME_INFO_REQUEST_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
     public void handleThemeInfoRequest(KafkaThemeInfoRequestDto request) {
         try {
@@ -82,6 +92,11 @@ public class ThemeConsumerService {
         }
     }
 
+    /**
+     * kafka consumer 카페 테마 시간 조회
+     *
+     * @param request 조회할 테마 시간의 값
+     */
     @KafkaListener(topics = KafkaTopic.THEME_TIME_REQUEST_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
     public void handleThemeTimeRequest(KafkaThemeTimeRequestDto request) {
         try {
