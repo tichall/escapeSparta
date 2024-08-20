@@ -36,116 +36,115 @@ import java.util.Map;
 @Slf4j
 public class PaymentService {
 
-  private final ReservationRepository reservationRepository;
-  private final PaymentRepository paymentRepository;
+    private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
 
-  public Long reservationId;
-  @Value("${kakao-payment.admin-key}")
-  private String kakaoApiKey; //kakao api key
-  @Value("${kakao-payment.cid}")
-  private String cid; // 가맹점 코드
-  @Value("${kakao-payment.approve-url}")
-  private String approveURL; //결제창 넘겨주기
-  @Value("${kakao-payment.cancel-url}")
-  private String cancelURL; // 결제실패
-  @Value("${kakao-payment.fail-url}")
-  private String failURL; //결제완료
-
-
-  //단건결제
-  private static final String KAKAO_PAY_API_URL = "https://open-api.kakaopay.com/online/v1/payment/ready";
-  //주문조회
-  private static final String KAKAO_ORDER_API_URL = "https://open-api.kakaopay.com/online/v1/payment/order";
-  //결제취소
-  private static final String KAKAO_CANCEL_API_URL = "https://open-api.kakaopay.com/online/v1/payment/cancel";
+    public Long reservationId;
+    @Value("${kakao-payment.admin-key}")
+    private String kakaoApiKey; //kakao api key
+    @Value("${kakao-payment.cid}")
+    private String cid; // 가맹점 코드
+    @Value("${kakao-payment.approve-url}")
+    private String approveURL; //결제창 넘겨주기
+    @Value("${kakao-payment.cancel-url}")
+    private String cancelURL; // 결제실패
+    @Value("${kakao-payment.fail-url}")
+    private String failURL; //결제완료
 
 
-  /**
-   * TODO: 결제할 수 있는 URL 넘겨줌
-   *
-   * @param reservationId 예약 아이디
-   * @return key - value format json
-   * @author SEMI
-   */
-  public KakaoResponseDto preparePayment(Long reservationId) {
+    //단건결제
+    private static final String KAKAO_PAY_API_URL = "https://open-api.kakaopay.com/online/v1/payment/ready";
+    //주문조회
+    private static final String KAKAO_ORDER_API_URL = "https://open-api.kakaopay.com/online/v1/payment/order";
+    //결제취소
+    private static final String KAKAO_CANCEL_API_URL = "https://open-api.kakaopay.com/online/v1/payment/cancel";
 
-    Reservation reservation = reservationRepository.findByIdOrElse(reservationId);
 
-    RestTemplate restTemplate = new RestTemplate();
+    /**
+     * 카카오 페이 결제진행할 url
+     *
+     * @param reservationId 예약 id
+     * @return KakaoResponseDto 결제고유번호(tid) , 결제진행할 url(next_redirect_pc_url)
+     */
+    public KakaoResponseDto preparePayment(Long reservationId) {
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    headers.set("Authorization", "SECRET_KEY " + kakaoApiKey);
+        Reservation reservation = reservationRepository.findByIdOrElse(reservationId);
 
-    Map<String, String> params = new HashMap<>();
-    params.put("cid", cid);
-    params.put("partner_order_id", String.valueOf(reservationId));
-    params.put("partner_user_id", String.valueOf(reservation.getUser().getId()));
+        RestTemplate restTemplate = new RestTemplate();
 
-    String itemName = reservation.getTheme().getTitle() + " / " +
-        reservation.getPlayer() + "인 / " +
-        reservation.getThemeTime().getStartTime();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "SECRET_KEY " + kakaoApiKey);
 
-    params.put("item_name", itemName);
-    params.put("quantity", "1"); //1개의 예약은 1개의 수량 고정
-    params.put("total_amount", String.valueOf(reservation.getPrice()));
-    params.put("vat_amount", "0");
-    params.put("tax_free_amount", "0");
-    params.put("approval_url", approveURL);
-    params.put("cancel_url", cancelURL + "/" + this.reservationId);
-    params.put("fail_url", failURL + "/" + this.reservationId);
+        Map<String, String> params = new HashMap<>();
+        params.put("cid", cid);
+        params.put("partner_order_id", String.valueOf(reservationId));
+        params.put("partner_user_id", String.valueOf(reservation.getUser().getId()));
 
-    HttpEntity<Map<String, String>> entity = new HttpEntity<>(params, headers);
+        String itemName = reservation.getTheme().getTitle() + " / " +
+                reservation.getPlayer() + "인 / " +
+                reservation.getThemeTime().getStartTime();
 
-    ResponseEntity<Map> response = restTemplate.postForEntity(KAKAO_PAY_API_URL, entity, Map.class);
+        params.put("item_name", itemName);
+        params.put("quantity", "1"); //1개의 예약은 1개의 수량 고정
+        params.put("total_amount", String.valueOf(reservation.getPrice()));
+        params.put("vat_amount", "0");
+        params.put("tax_free_amount", "0");
+        params.put("approval_url", approveURL);
+        params.put("cancel_url", cancelURL + "/" + this.reservationId);
+        params.put("fail_url", failURL + "/" + this.reservationId);
 
-    return new KakaoResponseDto(response.getBody().get("tid").toString(),
-        response.getBody().get("next_redirect_pc_url").toString());
-  }
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(params, headers);
 
-  /**
-   * TODO: 결제 성공 화면
-   *
-   * @author SEMI
-   */
-  @Transactional
-  public PaymentResponseDto kakaoPaySuccess(PaymentCreateRequestDto requestDto) {
+        ResponseEntity<Map> response = restTemplate.postForEntity(KAKAO_PAY_API_URL, entity, Map.class);
 
-    Reservation reservation = reservationRepository.findByIdOrElse(requestDto.getReservationId());
-
-    Payment payment = Payment.builder()
-        .tid(requestDto.getTid())
-        .cid(cid)
-        .reservation(reservation)
-        .build();
-
-    if (reservation.getReservationStatus() == ReservationStatus.COMPLETE ||
-        paymentRepository.findPaymentByReservationThemeTimeId(
-            payment.getReservation().getThemeTime().getId()) != null) {
-      throw new ReservationException(ReservationErrorCode.RESERVATION_DUPLICATION);
+        return new KakaoResponseDto(response.getBody().get("tid").toString(),
+                response.getBody().get("next_redirect_pc_url").toString());
     }
 
-    reservation.updateReservationStatus(); // change Reservation COMPLETE
-    reservation.getThemeTime().updateThemeTimeStatus(ThemeTimeStatus.DISABLE);
-    paymentRepository.save(payment);
+    /**
+     * 카카오 페이 결제완료시 payment에 데이터 저장
+     *
+     * @param requestDto : reservationId - 예약 id, tid - 결제고유번호
+     * @return PaymentResponseDto 완료된 결제 정보
+     */
+    @Transactional
+    public PaymentResponseDto kakaoPaySuccess(PaymentCreateRequestDto requestDto) {
 
-    return new PaymentResponseDto(payment);
-  }
+        Reservation reservation = reservationRepository.findByIdOrElse(requestDto.getReservationId());
 
-  /**
-   * TODO: 결제 환불
-   *
-   * @return key - value format json
-   * @author SEMI
-   */
-  @Transactional
-  public void refundPayment(Long reservationId) {
+        Payment payment = Payment.builder()
+                .tid(requestDto.getTid())
+                .cid(cid)
+                .reservation(reservation)
+                .build();
 
-    Payment payment = paymentRepository.findByReservationId(reservationId);
+        if (reservation.getReservationStatus() == ReservationStatus.COMPLETE ||
+                paymentRepository.findPaymentByReservationThemeTimeId(
+                        payment.getReservation().getThemeTime().getId()) != null) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_DUPLICATION);
+        }
 
-    if (payment.getPaymentStatus() != PaymentStatus.COMPLETE) {
-      throw new PaymentException(PaymentErrorCode.ALREAY_REFUND);
+        reservation.updateReservationStatus(); // change Reservation COMPLETE
+        reservation.getThemeTime().updateThemeTimeStatus(ThemeTimeStatus.DISABLE);
+        paymentRepository.save(payment);
+
+        return new PaymentResponseDto(payment);
     }
+
+    /**
+     * 카카오 페이 환불
+     *
+     * @param reservationId 예약 id
+     */
+    @Transactional
+    public void refundPayment(Long reservationId) {
+
+        Payment payment = paymentRepository.findByReservationId(reservationId);
+
+        if (payment.getPaymentStatus() != PaymentStatus.COMPLETE) {
+            throw new PaymentException(PaymentErrorCode.ALREAY_REFUND);
+        }
 //        RestTemplate restTemplate = new RestTemplate();
 //
 //        HttpHeaders headers = new HttpHeaders();
@@ -162,12 +161,12 @@ public class PaymentService {
 //
 //        ResponseEntity<Map> response = restTemplate.postForEntity(KAKAO_CANCEL_API_URL, entity, Map.class);
 
-    Reservation reservation = payment.getReservation();
+        Reservation reservation = payment.getReservation();
 
-    reservation.cancelReservationStatus();
-    ThemeTime themeTime = reservation.getThemeTime();
-    themeTime.updateThemeTimeStatus();
-    payment.refundPayment();
-  }
+        reservation.cancelReservationStatus();
+        ThemeTime themeTime = reservation.getThemeTime();
+        themeTime.updateThemeTimeStatus();
+        payment.refundPayment();
+    }
 
 }

@@ -23,8 +23,9 @@ public class FollowService {
 
     /**
      * 방탈출 카페 팔로우
+     *
      * @param storeId 팔로우할 카페 id
-     * @param user 로그인 유저
+     * @param user    로그인 유저
      */
     @Transactional
     public void followStore(Long storeId, User user) {
@@ -41,8 +42,9 @@ public class FollowService {
 
     /**
      * 방탈출 카페 언팔로우
+     *
      * @param storeId 언팔로우할 카페 id
-     * @param user 로그인 유저
+     * @param user    로그인 유저
      */
     @Transactional
     public void unfollowStore(Long storeId, User user) {
@@ -53,8 +55,9 @@ public class FollowService {
 
     /**
      * 팔로우한 카페 조회
+     *
      * @param user 로그인 유저
-     * @return 팔로우한 카페 리턴
+     * @return 팔로우한 카페
      */
     @Transactional(readOnly = true)
     public List<FollowStoreResponseDto> getFollowStores(User user) {

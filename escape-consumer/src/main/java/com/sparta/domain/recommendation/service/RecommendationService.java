@@ -20,7 +20,8 @@ public class RecommendationService {
 
     /**
      * 좋아요 등록
-     * @param user 로그인 유저
+     *
+     * @param user    로그인 유저
      * @param themeId 좋아요할 테마 id
      */
     @Transactional
@@ -38,7 +39,8 @@ public class RecommendationService {
 
     /**
      * 좋아요 취소
-     * @param user 로그인 유저
+     *
+     * @param user             로그인 유저
      * @param recommendationId 좋아요 id
      */
     @Transactional

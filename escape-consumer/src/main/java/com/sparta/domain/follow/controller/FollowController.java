@@ -19,68 +19,74 @@ import java.util.List;
 @RequestMapping("/api/consumer/follow")
 public class FollowController {
 
-  private final FollowService followService;
+    private final FollowService followService;
 
-  /**
-   * 방탈출 카페 팔로우
-   *
-   * @param storeId     팔로우할 카페 id
-   * @param userDetails 로그인 유저
-   * @return {@code ResponseEntity<ResponseMessage<Void>>} 메세지가 담긴 response
-   */
-  @PostMapping("/stores/{storeId}")
-  public ResponseEntity<ResponseMessage<Void>> followStore(
-      @PathVariable Long storeId,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    /**
+     * 방탈출 카페 팔로우
+     *
+     * @param storeId     팔로우할 카페 id
+     * @param userDetails 로그인 유저
+     * @return status.code, message
+     */
+    @PostMapping("/stores/{storeId}")
+    public ResponseEntity<ResponseMessage<Void>> followStore(
+            @PathVariable Long storeId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    followService.followStore(storeId, userDetails.getUser());
+        followService.followStore(storeId, userDetails.getUser());
 
-    ResponseMessage<Void> responseMessage = ResponseMessage.<Void>builder()
-        .statusCode(HttpStatus.OK.value())
-        .message("방탈출 카페를 팔로우 하였습니다.")
-        .data(null)
-        .build();
+        ResponseMessage<Void> responseMessage = ResponseMessage.<Void>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("방탈출 카페를 팔로우 하였습니다.")
+                .data(null)
+                .build();
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 
-  /**
-   * 방탈출 카페 언팔로우
-   *
-   * @param storeId     언팔로우할 카페 id
-   * @param userDetails 로그인 유저
-   * @return status.code, message
-   */
-  @DeleteMapping("/stores/{storeId}")
-  public ResponseEntity<ResponseMessage<Void>> unfollowStore(
-      @PathVariable Long storeId,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    /**
+     * 방탈출 카페 언팔로우
+     *
+     * @param storeId     언팔로우할 카페 id
+     * @param userDetails 로그인 유저
+     * @return status.code, message
+     */
+    @DeleteMapping("/stores/{storeId}")
+    public ResponseEntity<ResponseMessage<Void>> unfollowStore(
+            @PathVariable Long storeId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    followService.unfollowStore(storeId, userDetails.getUser());
+        followService.unfollowStore(storeId, userDetails.getUser());
 
-    ResponseMessage<Void> responseMessage = ResponseMessage.<Void>builder()
-        .statusCode(HttpStatus.OK.value())
-        .message("방탈출 카페를 팔로우 취소 하였습니다.")
-        .data(null)
-        .build();
+        ResponseMessage<Void> responseMessage = ResponseMessage.<Void>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("방탈출 카페를 팔로우 취소 하였습니다.")
+                .data(null)
+                .build();
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 
-  @GetMapping("/stores")
-  public ResponseEntity<ResponseMessage<List<FollowStoreResponseDto>>> getFollowStores(
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    /**
+     * 방탈출 카페 팔로우 목록
+     *
+     * @param userDetails 로그인 유저
+     * @return status.code, message, FollowStoreResponseDto(팔로우한 방탈출카페 목록)
+     */
+    @GetMapping("/stores")
+    public ResponseEntity<ResponseMessage<List<FollowStoreResponseDto>>> getFollowStores(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    List<FollowStoreResponseDto> responseDtoList = followService.getFollowStores(
-        userDetails.getUser());
+        List<FollowStoreResponseDto> responseDtoList = followService.getFollowStores(
+                userDetails.getUser());
 
-    ResponseMessage<List<FollowStoreResponseDto>> responseMessage = ResponseMessage
-        .<List<FollowStoreResponseDto>>builder()
-        .statusCode(HttpStatus.OK.value())
-        .message("팔로우한 방탈출 카페를 조회했습니다.")
-        .data(responseDtoList)
-        .build();
+        ResponseMessage<List<FollowStoreResponseDto>> responseMessage = ResponseMessage
+                .<List<FollowStoreResponseDto>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("팔로우한 방탈출 카페를 조회했습니다.")
+                .data(responseDtoList)
+                .build();
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 }
