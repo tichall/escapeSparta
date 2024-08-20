@@ -16,16 +16,10 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class FollowRepositoryImpl implements FollowRepositoryCustom {
+public class FollowRepositoryImpl implements FollowRepositoryCustom{
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    /**
-     * 팔로우한 방탈출 카페 조회
-     *
-     * @param user 로그인한 유저
-     * @return List<Follow> 팔로우한 방탈출 카페 리스트
-     */
     @Override
     public List<Follow> findByGetStores(User user) {
         QFollow follow = QFollow.follow;

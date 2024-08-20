@@ -16,6 +16,13 @@ public class AuthController {
 
   private final AuthService authService;
 
+  /**
+   * Access Token을 재발급합니다.
+   *
+   * @param request  HttpServletRequest 객체
+   * @param response HttpServletResponse 객체
+   * @return 재발급된 Access Token에 대한 응답 메시지
+   */
   @PostMapping("/api/core/auth/reissue")
   public ResponseEntity<ResponseMessage<Void>> reissue(HttpServletRequest request,
       HttpServletResponse response) {

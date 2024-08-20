@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.domain.payment.entity.QPayment;
-import com.sparta.domain.reservation.entity.PaymentStatus;
 import com.sparta.domain.reservation.entity.QReservation;
 import com.sparta.domain.reservation.entity.ReservationStatus;
 import com.sparta.domain.store.entity.QStore;
@@ -17,6 +16,8 @@ import com.sparta.domain.store.entity.StoreStatus;
 import com.sparta.domain.theme.entity.QTheme;
 import com.sparta.global.exception.customException.StoreException;
 import com.sparta.global.exception.errorCode.StoreErrorCode;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,9 +26,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-
 @Repository
 @RequiredArgsConstructor
 @Slf4j
@@ -35,6 +33,14 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 
   private final JPAQueryFactory jpaQueryFactory;
 
+  /**
+   * 스토어 이름과 지역을 기반으로 페이지네이션된 스토어 목록을 조회합니다.
+   *
+   * @param name        조회할 스터어 이름
+   * @param storeRegion 조회할 스토어 지역
+   * @param pageable    페이지네이션 정보
+   * @return 페이지네이션된 상점 목록
+   */
   @Override
   public Page<Store> findByName(String name, StoreRegion storeRegion, Pageable pageable) {
     QStore store = QStore.store;
@@ -68,6 +74,13 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 //        return new PageImpl<>(results, pageable, Optional.ofNullable(total.fetchOne()).orElse(0L));
   }
 
+  /**
+   * 활성화된 스토어 ID 기반으로 조회합니다.
+   *
+   * @param storeId 조회할 스토어 ID
+   * @return 조회된 스토어 정보
+   * @throws StoreException 스토어를 찾을 수 없는 경우
+   */
   @Override
   public Store findByActiveStore(Long storeId) {
     QStore store = QStore.store;
@@ -90,6 +103,11 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
     return storeRegion == StoreRegion.ALL ? null : store.storeRegion.eq(storeRegion);
   }
 
+  /**
+   * 상위 10개의 스토어를 조회합니다.
+   *
+   * @return 상위 10개의 스토어 목록
+   */
   @Override
   public List<Store> findTopStore() {
     QStore store = QStore.store;

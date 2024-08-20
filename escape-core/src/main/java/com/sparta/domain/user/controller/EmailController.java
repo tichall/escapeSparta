@@ -22,6 +22,13 @@ public class EmailController {
 
   private final EmailService emailService;
 
+  /**
+   * 인증 번호를 이메일로 발송합니다.
+   *
+   * @param requestDto 인증 요청 정보를 담은 DTO
+   * @return 인증 번호가 발송된 이메일 주소에 대한 응답 메시지
+   * @throws MessagingException 이메일 발송 중 오류가 발생한 경우
+   */
   @PostMapping
   public ResponseEntity<ResponseMessage<String>> sendCertificationNumber(
       @Valid @RequestBody CertificateRequestDto requestDto)
