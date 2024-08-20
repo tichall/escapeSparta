@@ -22,6 +22,14 @@ public class ThemeTimeAdminController {
 
   private final ThemeTimeAdminService themeTimeService;
 
+  /**
+   * 테마 예약 시간대 등록
+   *
+   * @param themeId     테마 id
+   * @param requestDto  등록할 시간대 정보
+   * @param userDetails 로그인한 관리자 정보
+   * @return status.code, message, 등록한 예약 시간대 정보 반환
+   */
   @PostMapping("/{themeId}/theme-time")
   public ResponseEntity<ResponseMessage<ThemeTimeDetailResponseDto>> createThemeTime(
       @PathVariable Long themeId,
@@ -39,6 +47,14 @@ public class ThemeTimeAdminController {
     return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
   }
 
+  /**
+   * 테마 예약 시간대 조회
+   *
+   * @param themeId     테마 id
+   * @param date        날짜
+   * @param userDetails 로그인한 관리자 정보
+   * @return status.code, message, 예약 시간대 리스트 반환
+   */
   @GetMapping("/{themeId}/theme-time")
   public ResponseEntity<ResponseMessage<List<ThemeTimeDetailResponseDto>>> getThemeTimes(
       @PathVariable Long themeId,
@@ -56,6 +72,14 @@ public class ThemeTimeAdminController {
     return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
   }
 
+  /**
+   * 테마 예약 시간대 수정
+   *
+   * @param themeTimeId 예약 시간대 id
+   * @param requestDto  수정할 예약 시간대 정보
+   * @param userDetails 로그인한 관리자 정보
+   * @return status.code, message, 수정된 예약 시간대 정보 반환
+   */
   @PutMapping("/theme-time/{themeTimeId}")
   public ResponseEntity<ResponseMessage<ThemeTimeDetailResponseDto>> modifyThemeTime(
       @PathVariable Long themeTimeId,
@@ -74,6 +98,13 @@ public class ThemeTimeAdminController {
     return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
   }
 
+  /**
+   * 테마 예약 시간대 삭제
+   *
+   * @param themeTimeId 예약 시간대 id
+   * @param userDetails 로그인한 관리자 정보
+   * @return status.code, message
+   */
   @DeleteMapping("/theme-time/{themeTimeId}")
   public ResponseEntity<ResponseMessage<Void>> deleteThemeTime(
       @PathVariable Long themeTimeId,

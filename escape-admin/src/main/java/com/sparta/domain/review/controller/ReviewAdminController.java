@@ -20,8 +20,8 @@ public class ReviewAdminController {
   /**
    * 리뷰 강제 삭제
    *
-   * @param reviewId
-   * @author SEMI
+   * @param reviewId 리뷰 id
+   * @return status.code, message
    */
   @DeleteMapping("/reviews/{reviewId}")
   public ResponseEntity<ResponseMessage<Void>> deleteReview(

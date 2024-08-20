@@ -21,6 +21,13 @@ public class ReservationController {
 
   private final ReservationService reservationService;
 
+  /**
+   * 해당 테마의 예약 내역 조회
+   *
+   * @param themeId     테마 id
+   * @param userDetails 로그인한 매니저 정보
+   * @return status.code, message, 예약 내역 반환
+   */
   @GetMapping("/{themeId}/reservations")
   public ResponseEntity<ResponseMessage<ReservationListResponseDto>> getReservations(
       @PathVariable Long themeId,
@@ -38,6 +45,13 @@ public class ReservationController {
     return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
   }
 
+  /**
+   * 예약 강제 취소
+   *
+   * @param reservationId 예약 Id
+   * @param userDetails   로그인한 매니저 정보
+   * @return status.code, message 반환
+   */
   @DeleteMapping("/reservations/{reservationId}")
   public ResponseEntity<ResponseMessage<Void>> cancelReservation(
       @PathVariable Long reservationId,

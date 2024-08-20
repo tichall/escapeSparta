@@ -10,21 +10,18 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReviewAdminService {
 
-    public final ReviewRepository reviewRepository;
+  public final ReviewRepository reviewRepository;
 
-    /**
-     * 리뷰 강제 삭제
-     *
-     * @param reviewId
-     * @author SEMI
-     */
-    @Transactional
-    public void deleteReview(Long reviewId) {
-
-        Review review = reviewRepository.findByIdOrElse(reviewId);
-
-        reviewRepository.delete(review);
-    }
+  /**
+   * 리뷰 강제 삭제
+   *
+   * @param reviewId 리뷰 id
+   */
+  @Transactional
+  public void deleteReview(Long reviewId) {
+    Review review = reviewRepository.findByIdOrElse(reviewId);
+    reviewRepository.delete(review);
+  }
 
 
 }

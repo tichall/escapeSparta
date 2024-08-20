@@ -17,6 +17,12 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+    /**
+     * ThemeTimeId 로 Payment 찾기
+     *
+     * @param reservationThemeTimeId 테마시간 id
+     * @return Payment
+     */
     @Override
     public Payment findPaymentByReservationThemeTimeId(Long reservationThemeTimeId) {
         QPayment payment = QPayment.payment;
@@ -30,6 +36,12 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
         return result;
     }
 
+    /**
+     * Payment Tid(결제고유아이디)로 찾기
+     *
+     * @param tid 테마시간 id
+     * @return Payment
+     */
     @Override
     public Payment findByTid(String tid) {
         QPayment payment = QPayment.payment;
@@ -46,6 +58,12 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
         return result;
     }
 
+    /**
+     * ReservationId 예약 id로 Payment찾기
+     *
+     * @param reservationId 예약 id
+     * @return Payment
+     */
     public Payment findByReservationId(Long reservationId) {
         QPayment payment = QPayment.payment;
         QReservation reservation = QReservation.reservation;

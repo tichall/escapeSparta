@@ -7,10 +7,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/consumer")
 public class ConsumerStatusController {
 
-  @GetMapping("/consumer/status")
+  /**
+   * 로드밸런서 대상 그룹 상태 검사
+   */
+  @GetMapping("/status")
   public ResponseEntity<String> getStatus() {
     String statusMessage = "Service is running";
     return new ResponseEntity<>(statusMessage, HttpStatus.OK);

@@ -16,52 +16,52 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/consumer/recommendation")
 public class RecommendationController {
 
-  private final RecommendationService recommendationService;
+    private final RecommendationService recommendationService;
 
-  /**
-   * 좋아요 등록
-   *
-   * @param userDetails 로그인 유저
-   * @param themeId     좋아요할 테마 id
-   * @return 좋아요 등록 메세지
-   */
-  @PostMapping("/theme/{themeId}")
-  public ResponseEntity<ResponseMessage<Void>> createRecommendation(
-      @AuthenticationPrincipal UserDetailsImpl userDetails,
-      @PathVariable Long themeId) {
+    /**
+     * 좋아요 등록
+     *
+     * @param userDetails 로그인 유저
+     * @param themeId     좋아요할 테마 id
+     * @return status.code, message
+     */
+    @PostMapping("/theme/{themeId}")
+    public ResponseEntity<ResponseMessage<Void>> createRecommendation(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long themeId) {
 
-    recommendationService.createRecommendation(userDetails.getUser(), themeId);
+        recommendationService.createRecommendation(userDetails.getUser(), themeId);
 
-    ResponseMessage<Void> responseMessage = ResponseMessage.<Void>builder()
-        .statusCode(HttpStatus.CREATED.value())
-        .message("방탈출 카페 테마를 좋아요 했습니다.")
-        .data(null)
-        .build();
+        ResponseMessage<Void> responseMessage = ResponseMessage.<Void>builder()
+                .statusCode(HttpStatus.CREATED.value())
+                .message("방탈출 카페 테마를 좋아요 했습니다.")
+                .data(null)
+                .build();
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
-  }
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
+    }
 
-  /**
-   * 좋아요 취소
-   *
-   * @param userDetails      로그인 유저
-   * @param recommendationId 좋아요 id
-   * @return 좋아요 취소 메세지
-   */
-  @DeleteMapping("/{recommendationId}")
-  public ResponseEntity<ResponseMessage<Void>> deleteRecommendation(
-      @AuthenticationPrincipal UserDetailsImpl userDetails,
-      @PathVariable Long recommendationId) {
+    /**
+     * 좋아요 취소
+     *
+     * @param userDetails      로그인 유저
+     * @param recommendationId 좋아요 id
+     * @return status.code, message
+     */
+    @DeleteMapping("/{recommendationId}")
+    public ResponseEntity<ResponseMessage<Void>> deleteRecommendation(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long recommendationId) {
 
-    recommendationService.deleteRecommendation(userDetails.getUser(), recommendationId);
+        recommendationService.deleteRecommendation(userDetails.getUser(), recommendationId);
 
-    ResponseMessage<Void> responseMessage = ResponseMessage.<Void>builder()
-        .statusCode(HttpStatus.OK.value())
-        .message("방탈출 카페 테마를 좋아요 취소 했습니다.")
-        .data(null)
-        .build();
+        ResponseMessage<Void> responseMessage = ResponseMessage.<Void>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("방탈출 카페 테마를 좋아요 취소 했습니다.")
+                .data(null)
+                .build();
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 
 }

@@ -32,16 +32,25 @@ public class S3Uploader {
   @Value("${cloud.aws.s3.bucket}")
   private String bucket;
 
+  /**
+   * 방탈출 카페 이미지 업로드
+   */
   public String uploadStoreImage(MultipartFile file, Long storeId) {
     String imageDir = createStoreImageDir(storeId); // 파일 저장 경로 생성
     return uploadImage(file, imageDir);
   }
 
+  /**
+   * 방탈출 테마 이미지 업로드
+   */
   public String uploadThemeImage(MultipartFile file, Long storeId, Long themeId) {
     String imageDir = createThemeImageDir(storeId, themeId);
     return uploadImage(file, imageDir);
   }
 
+  /**
+   * 파일명 생성 후 이미지 업로드
+   */
   private String uploadImage(MultipartFile file, String imageDir) {
     if (!doesFileExist(file)) {
       return null;
