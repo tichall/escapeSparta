@@ -18,6 +18,13 @@ public class ReservationService {
   private final ReservationRepository reservationRepository;
   private final ThemeRepository themeRepository;
 
+  /**
+   * 해당 테마의 예약 내역 조회
+   *
+   * @param themeId 테마 id
+   * @param user    로그인한 매니저
+   * @return 예약 내역
+   */
   public ReservationListResponseDto getReservations(Long themeId, User user) {
     Theme theme = themeRepository.findThemeOfActiveStore(themeId);
     theme.getStore().checkManager(user);
@@ -26,13 +33,16 @@ public class ReservationService {
     return new ReservationListResponseDto(themeId, reservationList);
   }
 
+  /**
+   * 예약 강제 취소
+   *
+   * @param reservationId 예약 id
+   * @param user          로그인한 매니저
+   */
   @Transactional
   public void cancelReservation(Long reservationId, User user) {
     Reservation reservation = reservationRepository.findActiveReservation(reservationId);
     reservation.getTheme().getStore().checkManager(user);
-
-    // 환불 기능 추가 예정
-
-    reservation.updateReservationStatus();
+    reservation.cancelReservation();
   }
 }

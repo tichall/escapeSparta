@@ -25,6 +25,11 @@ public class StoreController {
 
   /**
    * 방탈출 카페 등록 요청
+   *
+   * @param file        카페 이미지 파일
+   * @param requestDto  등록할 카페 정보 Dto
+   * @param userDetails 로그인한 매니저 정보
+   * @return status.code, message, 등록 요청한 카페 정보 반환
    */
   @PostMapping
   public ResponseEntity<ResponseMessage<StoreRegisterResponseDto>> registerStore(
@@ -47,6 +52,9 @@ public class StoreController {
 
   /**
    * 본인의 방탈출 카페 조회
+   *
+   * @param userDetails 로그인한 매니저 정보
+   * @return status.code, message, 조회한 카페 리스트 반환
    */
   @GetMapping
   public ResponseEntity<ResponseMessage<StoresGetResponseDto>> getMyStore(
@@ -64,6 +72,11 @@ public class StoreController {
 
   /**
    * 방탈출 카페 수정
+   *
+   * @param storeId     방탈출 카페 id
+   * @param requestDto  수정할 카페 정보 Dto
+   * @param userDetails 로그인한 매니저 정보
+   * @return status.code, message, 수정한 카페 정보 반환
    */
   @PutMapping("/{storeId}")
   public ResponseEntity<ResponseMessage<StoreDetailResponseDto>> modifyStore(
@@ -85,6 +98,11 @@ public class StoreController {
 
   /**
    * 방탈출 카페 이미지 수정
+   *
+   * @param storeId     카페 id
+   * @param file        수정할 이미지 파일
+   * @param userDetails 로그인한 매니저 정보
+   * @return status.code, message, 수정한 이미지 경로 반환
    */
   @PutMapping("/{storeId}/image")
   public ResponseEntity<ResponseMessage<String>> modifyStoreImage(
@@ -105,6 +123,10 @@ public class StoreController {
 
   /**
    * 방탈출 카페 이미지 삭제
+   *
+   * @param storeId     카페 id
+   * @param userDetails 로그인한 매니저 정보
+   * @return status.code, message
    */
   @DeleteMapping("/{storeId}/image")
   public ResponseEntity<ResponseMessage<Void>> deleteStoreImage(
@@ -123,6 +145,10 @@ public class StoreController {
 
   /**
    * 방탈출 카페 삭제
+   *
+   * @param storeId     카페 id
+   * @param userDetails 로그인한 매니저 정보
+   * @return status.code, message
    */
   @DeleteMapping("/{storeId}")
   public ResponseEntity<ResponseMessage<Void>> deleteStore(

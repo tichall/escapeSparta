@@ -20,9 +20,9 @@ public class UserAdminService {
   private final UserRepository userRepository;
 
   /**
-   * 모든 Manager 조회
+   * 모든 Manager 정보 조회
    *
-   * @author SEMI
+   * @return Manager 정보 리스트
    */
   @Transactional(readOnly = true)
   public List<UserResponseDto> getAllManagers() {
@@ -35,9 +35,9 @@ public class UserAdminService {
   }
 
   /**
-   * 모든 Consumer 조회
+   * 모든 Consumer 정보 조회
    *
-   * @author SEMI
+   * @return Consumer 정보 리스트
    */
   @Transactional(readOnly = true)
   public List<UserResponseDto> getAllConsumers() {
@@ -52,10 +52,10 @@ public class UserAdminService {
   /* Utils */
 
   /**
-   * user type로 필터링 된 모든 user 구하기
+   * UserType에 맞는 모든 유저 찾기
    *
-   * @param userType : ADMIN, MANAGER, USER
-   * @author SEMI
+   * @param userType 유저 타입
+   * @return 유저 리스트
    */
   private List<User> getUsers(UserType userType) {
     List<User> users = userRepository.findByUserType(userType);

@@ -37,7 +37,7 @@ public abstract class S3Util {
   }
 
   /**
-   * 방탈출 카페 이미지 경로 생성 store/{storeId}
+   * 방탈출 카페 이미지 경로 생성 {@code store/{storeId}}
    */
   public static String createStoreImageDir(Long storeId) {
     return STORE_DIR + "/"
@@ -45,7 +45,7 @@ public abstract class S3Util {
   }
 
   /**
-   * 방탈출 테마 이미지 저장 경로 생성 store/{storeId}/theme/{themeId}
+   * 방탈출 테마 이미지 저장 경로 생성 {@code store/{storeId}/theme/{themeId}}
    */
   public static String createThemeImageDir(Long storeId, Long themeId) {
     return STORE_DIR + "/" + storeId + "/"

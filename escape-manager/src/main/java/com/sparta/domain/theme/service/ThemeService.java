@@ -21,99 +21,151 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ThemeService {
-    private final ThemeRepository themeRepository;
-    private final StoreRepository storeRepository;
-    private final S3Uploader s3Uploader;
 
-    @Transactional
-    public ThemeDetailResponseDto createTheme(MultipartFile file, ThemeCreateRequestDto requestDto, User user) {
-        Store store = storeRepository.findByActiveStore(requestDto.getStoreId());
-        store.checkManager(user);
+  private final ThemeRepository themeRepository;
+  private final StoreRepository storeRepository;
+  private final S3Uploader s3Uploader;
 
-        Theme theme = Theme.builder()
-                .title(requestDto.getTitle())
-                .contents(requestDto.getContents())
-                .level(requestDto.getLevel())
-                .duration(requestDto.getDuration())
-                .minPlayer(requestDto.getMinPlayer())
-                .maxPlayer(requestDto.getMaxPlayer())
-                .price(requestDto.getPrice())
-                .themeType(requestDto.getThemeType())
-                .themeStatus(ThemeStatus.ACTIVE)
-                .store(store)
-                .build();
+  /**
+   * 방탈출 테마 등록
+   *
+   * @param file       테마 이미지 파일
+   * @param requestDto 테마 정보 Dto
+   * @param user       로그인한 매니저
+   * @return 등록한 테마 정보
+   */
+  @Transactional
+  public ThemeDetailResponseDto createTheme(MultipartFile file, ThemeCreateRequestDto requestDto,
+      User user) {
+    Store store = storeRepository.findByActiveStore(requestDto.getStoreId());
+    store.checkManager(user);
 
-        themeRepository.save(theme);
+    Theme theme = Theme.builder()
+        .title(requestDto.getTitle())
+        .contents(requestDto.getContents())
+        .level(requestDto.getLevel())
+        .duration(requestDto.getDuration())
+        .minPlayer(requestDto.getMinPlayer())
+        .maxPlayer(requestDto.getMaxPlayer())
+        .price(requestDto.getPrice())
+        .themeType(requestDto.getThemeType())
+        .themeStatus(ThemeStatus.ACTIVE)
+        .store(store)
+        .build();
 
-        String themeImage = s3Uploader.uploadThemeImage(file, store.getId(),theme.getId());
-        theme.updateThemeImage(themeImage);
+    themeRepository.save(theme);
 
-        return new ThemeDetailResponseDto(theme);
-    }
+    String themeImage = s3Uploader.uploadThemeImage(file, store.getId(), theme.getId());
+    theme.updateThemeImage(themeImage);
 
-    public ThemeGetResponseDto getThemes(Long storeId, User manager) {
-        Store findStore = storeRepository.findByActiveStore(storeId);
-        findStore.checkManager(manager);
+    return new ThemeDetailResponseDto(theme);
+  }
 
-        List<Theme> themeList = themeRepository.findAllByStoreId(storeId);
-        return new ThemeGetResponseDto(themeList);
-    }
+  /**
+   * 방탈출 카페의 전체 테마 조회
+   *
+   * @param storeId 카페 id
+   * @param user    로그인한 매니저 정보
+   * @return 전체 테마 리스트
+   */
+  public ThemeGetResponseDto getThemes(Long storeId, User user) {
+    Store findStore = storeRepository.findByActiveStore(storeId);
+    findStore.checkManager(user);
 
-    @Transactional
-    public ThemeDetailResponseDto modifyTheme(Long themeId, ThemeModifyRequestDto requestDto, User user) {
-        Theme theme = themeRepository.findThemeOfActiveStore(themeId);
-        theme.getStore().checkManager(user);
+    List<Theme> themeList = themeRepository.findAllByStoreId(storeId);
+    return new ThemeGetResponseDto(themeList);
+  }
 
-        theme.updateTheme(
-                requestDto.getTitle(),
-                requestDto.getContents(),
-                requestDto.getLevel(),
-                requestDto.getDuration(),
-                requestDto.getMinPlayer(),
-                requestDto.getMaxPlayer(),
-                requestDto.getThemeType(),
-                requestDto.getPrice()
-        );
+  /**
+   * 방탈출 테마 수정
+   *
+   * @param themeId    테마 id
+   * @param requestDto 수정할 테마 정보 Dto
+   * @param user       로그인한 매니저
+   * @return 수정한 테마 정보
+   */
+  @Transactional
+  public ThemeDetailResponseDto modifyTheme(Long themeId, ThemeModifyRequestDto requestDto,
+      User user) {
+    Theme theme = themeRepository.findThemeOfActiveStore(themeId);
+    theme.getStore().checkManager(user);
 
-        themeRepository.save(theme);
-        return new ThemeDetailResponseDto(theme);
-    }
+    theme.updateTheme(
+        requestDto.getTitle(),
+        requestDto.getContents(),
+        requestDto.getLevel(),
+        requestDto.getDuration(),
+        requestDto.getMinPlayer(),
+        requestDto.getMaxPlayer(),
+        requestDto.getThemeType(),
+        requestDto.getPrice()
+    );
 
-    @Transactional
-    public String modifyThemeImage(Long themeId, MultipartFile file, User user) {
-        Theme theme = themeRepository.findThemeOfActiveStore(themeId);
-        theme.getStore().checkManager(user);
+    themeRepository.save(theme);
+    return new ThemeDetailResponseDto(theme);
+  }
 
-        s3Uploader.deleteFileFromS3(theme.getThemeImage());
-        String themeImage = s3Uploader.uploadThemeImage(file, theme.getStore().getId(), themeId);
-        theme.updateThemeImage(themeImage);
+  /**
+   * 방탈출 테마 이미지 수정
+   *
+   * @param themeId 테마 id
+   * @param file    수정할 이미지 파일
+   * @param user    로그인한 매니저
+   * @return 수정한 이미지 경로
+   */
+  @Transactional
+  public String modifyThemeImage(Long themeId, MultipartFile file, User user) {
+    Theme theme = themeRepository.findThemeOfActiveStore(themeId);
+    theme.getStore().checkManager(user);
 
-        return themeImage;
-    }
+    s3Uploader.deleteFileFromS3(theme.getThemeImage());
+    String themeImage = s3Uploader.uploadThemeImage(file, theme.getStore().getId(), themeId);
+    theme.updateThemeImage(themeImage);
 
-    @Transactional
-    public void deleteThemeImage(Long themeId, User user) {
-        Theme theme = themeRepository.findThemeOfActiveStore(themeId);
-        theme.getStore().checkManager(user);
+    return themeImage;
+  }
 
-        s3Uploader.deleteFileFromS3(theme.getThemeImage());
-        theme.deleteThemeImage();
-    }
+  /**
+   * 방탈출 테마 이미지 삭제
+   *
+   * @param themeId 테마 id
+   * @param user    로그인한 매니저
+   */
+  @Transactional
+  public void deleteThemeImage(Long themeId, User user) {
+    Theme theme = themeRepository.findThemeOfActiveStore(themeId);
+    theme.getStore().checkManager(user);
 
-    @Transactional
-    public void deleteTheme(Long themeId, User user) {
-        Theme theme = themeRepository.findThemeOfActiveStore(themeId);
-        theme.getStore().checkManager(user);
+    s3Uploader.deleteFileFromS3(theme.getThemeImage());
+    theme.deleteThemeImage();
+  }
 
-        themeRepository.delete(theme);
-    }
+  /**
+   * 방탈출 테마 상태 변경
+   *
+   * @param themeId 테마 id
+   * @param user    로그인한 매니저
+   */
+  @Transactional
+  public void changeThemeStatus(Long themeId, User user) {
+    Theme theme = themeRepository.findThemeOfActiveStore(themeId);
+    theme.getStore().checkManager(user);
 
-    @Transactional
-    public void changeThemeStatus(Long themeId, User user) {
-        Theme theme = themeRepository.findThemeOfActiveStore(themeId);
-        theme.getStore().checkManager(user);
+    theme.toggleThemeStatus();
+  }
 
-        theme.toggleThemeStatus();
-    }
+  /**
+   * 방탈출 테마 완전히 삭제
+   *
+   * @param themeId 테마 id
+   * @param user    로그인한 매니저
+   */
+  @Transactional
+  public void deleteTheme(Long themeId, User user) {
+    Theme theme = themeRepository.findThemeOfActiveStore(themeId);
+    theme.getStore().checkManager(user);
+
+    themeRepository.delete(theme);
+  }
 }
 

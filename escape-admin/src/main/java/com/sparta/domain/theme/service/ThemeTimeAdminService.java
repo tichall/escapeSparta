@@ -20,57 +20,86 @@ import static com.sparta.global.util.LocalDateTimeUtil.*;
 @Service
 @RequiredArgsConstructor
 public class ThemeTimeAdminService {
-    private final ThemeTimeRepository themeTimeRepository;
-    private final ThemeRepository themeRepository;
 
-    @Transactional
-    public ThemeTimeDetailResponseDto createThemeTime(Long themeId, ThemeTimeCreateRequestDto requestDto) {
-        Theme theme = themeRepository.findThemeOfActiveStore(themeId);
+  private final ThemeTimeRepository themeTimeRepository;
+  private final ThemeRepository themeRepository;
 
-        LocalDateTime startTime = parseDateTimeStringToLocalDateTime(requestDto.getStartTime());
-        LocalDateTime endTime = calculateEndTime(startTime, theme.getDuration());
+  /**
+   * 테마 예약 시간대 등록
+   *
+   * @param themeId    테마 id
+   * @param requestDto 등록할 시간대 정보
+   * @return 등록한 예약 시간대 정보
+   */
+  @Transactional
+  public ThemeTimeDetailResponseDto createThemeTime(Long themeId,
+      ThemeTimeCreateRequestDto requestDto) {
+    Theme theme = themeRepository.findThemeOfActiveStore(themeId);
 
-        ThemeTime themeTime = ThemeTime.builder()
-                .startTime(startTime)
-                .endTime(endTime)
-                .theme(theme)
-                .build();
+    LocalDateTime startTime = parseDateTimeStringToLocalDateTime(requestDto.getStartTime());
+    LocalDateTime endTime = calculateEndTime(startTime, theme.getDuration());
 
-        themeTimeRepository.save(themeTime);
-        return new ThemeTimeDetailResponseDto(themeTime);
+    ThemeTime themeTime = ThemeTime.builder()
+        .startTime(startTime)
+        .endTime(endTime)
+        .theme(theme)
+        .build();
+
+    themeTimeRepository.save(themeTime);
+    return new ThemeTimeDetailResponseDto(themeTime);
+  }
+
+  /**
+   * 테마 예약 시간대 조회
+   *
+   * @param themeId 테마 id
+   * @param date    날짜
+   * @return 예약 시간대 리스트
+   */
+  public List<ThemeTimeDetailResponseDto> getThemeTimes(Long themeId, String date) {
+    Theme theme = themeRepository.findThemeOfActiveStore(themeId);
+    List<ThemeTime> themeTimes;
+
+    if (date == null) {
+      themeTimes = themeTimeRepository.findAllByThemeId(theme.getId());
+    } else {
+      LocalDate searchDate = parseDateStringToLocalDate(date);
+      themeTimes = themeTimeRepository.findThemeTimesByDate(themeId, searchDate);
     }
 
-    public List<ThemeTimeDetailResponseDto> getThemeTimes(Long themeId, String date) {
-        Theme theme = themeRepository.findThemeOfActiveStore(themeId);
-        List<ThemeTime> themeTimes;
+    return themeTimes.stream().map(ThemeTimeDetailResponseDto::new).toList();
+  }
 
-        if(date == null) {
-            themeTimes = themeTimeRepository.findAllByThemeId(theme.getId());
-        } else {
-            LocalDate searchDate = parseDateStringToLocalDate(date);
-            themeTimes = themeTimeRepository.findThemeTimesByDate(themeId, searchDate);
-        }
+  /**
+   * 테마 예약 시간대 수정
+   *
+   * @param themeTimeId 예약 시간대 id
+   * @param requestDto  수정할 예약 시간대 정보
+   * @return 수정된 예약 시간대 정보
+   */
+  @Transactional
+  public ThemeTimeDetailResponseDto modifyThemeTime(Long themeTimeId,
+      ThemeTimeModifyRequestDto requestDto) {
+    ThemeTime themeTime = themeTimeRepository.findThemeTimeOfActiveStore(themeTimeId);
 
-        return themeTimes.stream().map(ThemeTimeDetailResponseDto::new).toList();
-    }
+    LocalDateTime startTime = parseDateTimeStringToLocalDateTime(requestDto.getStartTime());
+    LocalDateTime endTime = calculateEndTime(startTime, themeTime.getTheme().getDuration());
 
-    @Transactional
-    public ThemeTimeDetailResponseDto modifyThemeTime(Long themeTimeId, ThemeTimeModifyRequestDto requestDto) {
-        ThemeTime themeTime = themeTimeRepository.findThemeTimeOfActiveStore(themeTimeId);
+    themeTime.updateThemeTime(startTime, endTime);
+    themeTimeRepository.save(themeTime);
 
-        LocalDateTime startTime = parseDateTimeStringToLocalDateTime(requestDto.getStartTime());
-        LocalDateTime endTime = calculateEndTime(startTime, themeTime.getTheme().getDuration());
+    return new ThemeTimeDetailResponseDto(themeTime);
+  }
 
-        themeTime.updateThemeTime(startTime, endTime);
-        themeTimeRepository.save(themeTime);
-
-        return new ThemeTimeDetailResponseDto(themeTime);
-    }
-
-    @Transactional
-    public void deleteThemeTime(Long themeTimeId) {
-        ThemeTime themeTime = themeTimeRepository.findThemeTimeOfActiveStore(themeTimeId);
-        themeTimeRepository.delete(themeTime);
-    }
+  /**
+   * 테마 예약 시간대 삭제
+   *
+   * @param themeTimeId 예약 시간대 id
+   */
+  @Transactional
+  public void deleteThemeTime(Long themeTimeId) {
+    ThemeTime themeTime = themeTimeRepository.findThemeTimeOfActiveStore(themeTimeId);
+    themeTimeRepository.delete(themeTime);
+  }
 
 }

@@ -164,9 +164,7 @@ public class PaymentService {
 
     Reservation reservation = payment.getReservation();
 
-    reservation.cancelReservationStatus();
-    ThemeTime themeTime = reservation.getThemeTime();
-    themeTime.updateThemeTimeStatus();
+    reservation.cancelReservation();
     payment.refundPayment();
   }
 
