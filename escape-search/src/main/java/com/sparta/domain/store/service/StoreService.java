@@ -71,6 +71,11 @@ public class StoreService {
     kafkaStoreTemplate.send(KafkaTopic.STORE_REQUEST_TOPIC, storeRequest);
   }
 
+  /**
+   * 인기 방탈출 카페 상세 조회
+   *
+   * @return store 반환
+   */
   @Cacheable(value = "top-stores", cacheManager = "redisCacheManager")
   public TopStoreResponseDto getTopStores() {
     String requestId = UUID.randomUUID().toString();
@@ -94,15 +99,13 @@ public class StoreService {
     kafkaTopStoreTemplate.send(KafkaTopic.TOP_STORE_REQUEST_TOPIC, topStoreRequest);
   }
 
+  /**
+   * 방탈출 카페 상세 조회
+   *
+   * @param storeId 조회할 카페 id
+   * @return storeInfo 반환
+   */
   public StoreDetailResponseDto getStoreInfo(Long storeId) {
-    Store store = storeRepository.findByActiveStore(storeId);
-    return new StoreDetailResponseDto(store);
-  }
-
-  @Cacheable(value = "storeInfo", key = "#storeId", cacheManager = "redisCacheManager")
-  // 캐시 이름 storeInfo
-  public StoreDetailResponseDto getStoreInfoWithCache(Long storeId) {
-    System.out.println("캐시 적용 안됨");
     Store store = storeRepository.findByActiveStore(storeId);
     return new StoreDetailResponseDto(store);
   }

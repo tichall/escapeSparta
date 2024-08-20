@@ -162,6 +162,12 @@ public class SearchController {
     return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
   }
 
+
+  /**
+   * 인기 방탈출 카페 조회
+   *
+   * @return status.code, message, store 반환
+   */
   @GetMapping("/top-stores")
   public ResponseEntity<ResponseMessage<TopStoreResponseDto>> getTopStores() {
 
@@ -176,6 +182,12 @@ public class SearchController {
     return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
   }
 
+  /**
+   * 방탈출 카페 상세 조회
+   *
+   * @param storeId 조회할 카페 id
+   * @return status.code, message, storeInfo 반환
+   */
   @GetMapping("/stores/{storeId}/info")
   public ResponseEntity<ResponseMessage<StoreDetailResponseDto>> getStoreInfo(
       @PathVariable Long storeId) {
@@ -190,22 +202,6 @@ public class SearchController {
 
     return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
   }
-
-  @GetMapping("/stores/{storeId}/info-cache")
-  public ResponseEntity<ResponseMessage<StoreDetailResponseDto>> getStoreInfoWithCache(
-      @PathVariable Long storeId) {
-
-    StoreDetailResponseDto responseDto = storeService.getStoreInfoWithCache(storeId);
-
-    ResponseMessage<StoreDetailResponseDto> responseMessage = ResponseMessage.<StoreDetailResponseDto>builder()
-        .statusCode(HttpStatus.OK.value())
-        .message("방탈출 카페 상세 조회에 성공했습니다.")
-        .data(responseDto)
-        .build();
-
-    return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-  }
-
 }
 
 
