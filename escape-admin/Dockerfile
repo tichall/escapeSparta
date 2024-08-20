@@ -3,18 +3,7 @@ FROM openjdk:17-jdk-slim
 
 # Set the working directory
 WORKDIR /apps
-## Copy the Gradle wrapper and build scripts
-#COPY gradlew .
-#COPY gradle/ gradle/
-#COPY build.gradle .
-#COPY settings.gradle .
 
-# Give gradlew file execute permissions
-#RUN chmod +x gradlew
-
-
-# Build the application
-#RUN ./gradlew bootJar
 COPY ./build/libs/*.jar /apps/escape-admin.jar
 
 # 어플리케이션 포트 설정 (예: 8080)
