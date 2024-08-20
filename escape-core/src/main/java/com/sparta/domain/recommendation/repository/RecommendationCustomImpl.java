@@ -13,17 +13,21 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class RecommendationCustomImpl implements RecommendationCustom{
+public class RecommendationCustomImpl implements RecommendationCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
+    /**
+     * 테마의 추천수 조회
+     *
+     * @param theme 테마
+     * @return 추천수
+     */
     @Override
     public Long findByThemeCount(Theme theme) {
 
         QRecommendation recommendation = QRecommendation.recommendation;
 
-        JPAQuery<Long> query = jpaQueryFactory.select(recommendation.count())
-                .from(recommendation)
-                .where(recommendation.theme.eq(theme));
+        JPAQuery<Long> query = jpaQueryFactory.select(recommendation.count()).from(recommendation).where(recommendation.theme.eq(theme));
 
         return Optional.ofNullable(query.fetchOne()).orElse(0L);
     }

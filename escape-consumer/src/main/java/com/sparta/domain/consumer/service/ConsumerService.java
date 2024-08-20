@@ -22,36 +22,53 @@ public class ConsumerService {
     private final PasswordEncoder passwordEncoder;
 
 
-    // pk값으로 유저 조회
+    /**
+     * pk값으로 유저 조회
+     *
+     * @param user 로그인 유저
+     * @return UserResponseDto 유저 프로필 정보
+     */
     @Transactional(readOnly = true)
     public UserResponseDto inquiryUser(User user) {
 
         return new UserResponseDto(user);
     }
 
-    // 유저 프로필 수정
+    /**
+     * 유저 프로필 수정
+     *
+     * @param requestDto 수정할 이름
+     * @param user       로그인 유저
+     * @return UserResponseDto 유저 프로필 정보
+     */
     @Transactional
-    public UserResponseDto modifyProfile(EditProfileRequestDto request, User user) {
+    public UserResponseDto modifyProfile(EditProfileRequestDto requestDto, User user) {
 
-        user.editUser(request.getName());
+        user.editUser(requestDto.getName());
         userRepository.save(user);
 
         return new UserResponseDto(user);
     }
 
-    //유저 비밀번호 변경
+    /**
+     * 유저 비밀번호 변경
+     *
+     * @param requestDto 수정할 비밀번호
+     * @param user       로그인 유저
+     * @return UserResponseDto 유저 프로필 정보
+     */
     @Transactional
-    public UserResponseDto editPassword(EditPasswordRequestDto requestDTO, User user) {
+    public UserResponseDto editPassword(EditPasswordRequestDto requestDto, User user) {
 
-        if (!passwordEncoder.matches(requestDTO.getCurrentPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(requestDto.getCurrentPassword(), user.getPassword())) {
             throw new UserException(UserErrorCode.PASSWORD_NOT_MATCH);
         }
 
-        if (passwordEncoder.matches(requestDTO.getNewPassword(), user.getPassword())) {
+        if (passwordEncoder.matches(requestDto.getNewPassword(), user.getPassword())) {
             throw new UserException(UserErrorCode.PASSWORD_NOT_MIXMATCH);
         }
 
-        String editPassword = passwordEncoder.encode(requestDTO.getNewPassword());
+        String editPassword = passwordEncoder.encode(requestDto.getNewPassword());
         user.changePassword(editPassword);
         userRepository.save(user);
 
