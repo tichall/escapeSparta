@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class SearchStatusController {
 
+  /**
+   * 로드 밸런서 대상그룹 상태 검사 용 api
+   */
   @GetMapping("/search/status")
   public ResponseEntity<String> getStatus() {
     String statusMessage = "Service is running";

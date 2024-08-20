@@ -26,6 +26,12 @@ public class StoreConsumerService {
   private final ConcurrentHashMap<String, CompletableFuture<Page<StoreResponseDto>>> responseStoreFutures;
   private final ConcurrentHashMap<String, CompletableFuture<TopStoreResponseDto>> responseTopStoreFutures;
 
+
+  /**
+   * kafka consumer 카페 조회
+   *
+   * @param request 조회할 카페들의 페이징 정보
+   */
   @KafkaListener(topics = KafkaTopic.STORE_REQUEST_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
   public void handleStoreRequest(KafkaStoreRequestDto request) {
     try {
@@ -51,6 +57,11 @@ public class StoreConsumerService {
     }
   }
 
+  /**
+   * kafka consumer 인기 카페 조회
+   *
+   * @param request 인기 카페 조회에 필요한 값
+   */
   @KafkaListener(topics = KafkaTopic.TOP_STORE_REQUEST_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
   public void handleTopStoreRequest(KafkaTopStoreRequestDto request) {
     try {
