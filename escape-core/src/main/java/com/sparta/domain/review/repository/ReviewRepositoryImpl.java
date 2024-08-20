@@ -22,10 +22,16 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
+public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
+    /**
+     * 해당 테마의 모든 리뷰조회
+     *
+     * @param theme 테마
+     * @return List<Review> 리뷰리스트
+     */
     @Override
     public List<Review> findByThemeReview(Theme theme) {
 
@@ -43,6 +49,12 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         return query.fetch();
     }
 
+    /**
+     * 내가 쓴 모든 리뷰
+     *
+     * @param user 로그인한 유저
+     * @return List<Review> 리뷰리스트
+     */
     @Override
     public List<Review> findByMyReviews(User user) {
         QReview review = QReview.review;
@@ -59,6 +71,12 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         return query.fetch();
     }
 
+    /**
+     * 리뷰 id로 리뷰조회
+     *
+     * @param reviewId 리뷰 id
+     * @return Review 리뷰
+     */
     @Override
     public Review findByReview(Long reviewId) {
         QReview review = QReview.review;

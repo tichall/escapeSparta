@@ -22,61 +22,78 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class ConsumerController {
 
-  private final UserService userService;
-  private final ConsumerService consumerService;
+    private final UserService userService;
+    private final ConsumerService consumerService;
 
-  //  로그인한 유저 프로필 조회
-  @GetMapping("/profile")
-  public ResponseEntity<ResponseMessage<UserResponseDto>> inquiryProfile(
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    /**
+     * 로그인한 유저 프로필 조회
+     *
+     * @param userDetails 로그인 유저
+     * @return UserResponseDto 유저 프로필 정보
+     */
+    @GetMapping("/profile")
+    public ResponseEntity<ResponseMessage<UserResponseDto>> inquiryProfile(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    User user = userDetails.getUser();
-    UserResponseDto userResponseDto = consumerService.inquiryUser(user);
+        User user = userDetails.getUser();
+        UserResponseDto userResponseDto = consumerService.inquiryUser(user);
 
-    ResponseMessage<UserResponseDto> responseMessage = ResponseMessage.<UserResponseDto>builder()
-        .statusCode(HttpStatus.OK.value())
-        .message("프로필 조회가 완료되었습니다.")
-        .data(userResponseDto)
-        .build();
+        ResponseMessage<UserResponseDto> responseMessage = ResponseMessage.<UserResponseDto>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("프로필 조회가 완료되었습니다.")
+                .data(userResponseDto)
+                .build();
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 
-  //  유저 프로필 수정
-  @PutMapping("/profile")
-  public ResponseEntity<ResponseMessage<UserResponseDto>> modifyProfile(
-      @AuthenticationPrincipal UserDetailsImpl userDetails,
-      @Valid @RequestBody EditProfileRequestDto editProfileRequestDto) {
+    /**
+     * 유저 프로필 수정
+     *
+     * @param userDetails           로그인 유저
+     * @param editProfileRequestDto 수정할 이름
+     * @return status.code, message, responseDto(유저정보) 반환
+     */
+    @PutMapping("/profile")
+    public ResponseEntity<ResponseMessage<UserResponseDto>> modifyProfile(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @Valid @RequestBody EditProfileRequestDto editProfileRequestDto) {
 
-    User user = userDetails.getUser();
-    UserResponseDto responseDto = consumerService.modifyProfile(editProfileRequestDto, user);
+        User user = userDetails.getUser();
+        UserResponseDto responseDto = consumerService.modifyProfile(editProfileRequestDto, user);
 
-    ResponseMessage<UserResponseDto> responseMessage = ResponseMessage.<UserResponseDto>builder()
-        .statusCode(HttpStatus.OK.value())
-        .message("프로필 수정이 완료되었습니다.")
-        .data(responseDto)
-        .build();
+        ResponseMessage<UserResponseDto> responseMessage = ResponseMessage.<UserResponseDto>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("프로필 수정이 완료되었습니다.")
+                .data(responseDto)
+                .build();
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 
-  //  비밀번호 수정
-  @PutMapping("/profile/password")
-  public ResponseEntity<ResponseMessage<UserResponseDto>> editPassword(
-      @AuthenticationPrincipal UserDetailsImpl userDetails,
-      @Valid @RequestBody EditPasswordRequestDto requestDTO) {
+    /**
+     * 비밀번호 수정
+     *
+     * @param userDetails 로그인 유저
+     * @param requestDTO  수정할 비밀번호
+     * @return status.code, message, responseDto(유저정보) 반환
+     */
+    @PutMapping("/profile/password")
+    public ResponseEntity<ResponseMessage<UserResponseDto>> editPassword(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @Valid @RequestBody EditPasswordRequestDto requestDTO) {
 
-    User user = userDetails.getUser();
-    UserResponseDto responseDto = consumerService.editPassword(requestDTO, user);
+        User user = userDetails.getUser();
+        UserResponseDto responseDto = consumerService.editPassword(requestDTO, user);
 
-    ResponseMessage<UserResponseDto> responseMessage = ResponseMessage.<UserResponseDto>builder()
-        .statusCode(HttpStatus.OK.value())
-        .message("비밀번호 수정이 완료되었습니다.")
-        .data(responseDto)
-        .build();
+        ResponseMessage<UserResponseDto> responseMessage = ResponseMessage.<UserResponseDto>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("비밀번호 수정이 완료되었습니다.")
+                .data(responseDto)
+                .build();
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 
 }
 
