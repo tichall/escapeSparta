@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+bootJar {
+    enabled = true
+    archiveFileName = 'escape-search.jar' // 생성될 JAR 파일 이름 설정
+}
+jar{enabled = false}
+
+dependencies {
+    implementation project(':escape-core')
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+}

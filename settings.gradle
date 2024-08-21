@@ -3,4 +3,6 @@ include 'escape-core'
 include 'escape-admin'
 include 'escape-manager'
 include 'escape-consumer'
+include 'escape-reservation'
+include 'escape-search'
 

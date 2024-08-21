@@ -1,0 +1,161 @@
+### 회원가입 전 이메일 인증
+POST http://localhost:8080/users/mail
+Content-Type: application/json
+
+{
+  "email": "0817frog@naver.com",
+  "userType": "USER"
+}
+
+### 회원가입 전 이메일 인증 - 매니저
+POST http://localhost:8080/users/mail
+Content-Type: application/json
+
+{
+  "email": "0817frog@gmail.com",
+  "userType": "MANAGER"
+}
+
+### 회원가입 전 이메일 인증 - admin
+POST http://localhost:8080/users/mail
+Content-Type: application/json
+
+{
+  "email": "0817frog@gmail.com",
+  "userType": "ADMIN"
+}
+
+### 회원가입
+POST http://localhost:8080/users/signup
+Content-Type: application/json
+
+{
+  "name": "이서연",
+  "email": "0817frog@naver.com",
+  "password": "Test1234!",
+  "certificateCode": "0718874"
+}
+
+### 회원가입 - 매니저
+POST http://localhost:8080/users/signup
+Content-Type: application/json
+
+{
+  "name": "이서연",
+  "email": "0817frog@gmail.com",
+  "password": "Test1234!",
+  "certificateCode": "22824"
+}
+
+### 회원가입 - admin
+POST http://localhost:8080/users/signup
+Content-Type: application/json
+
+{
+  "name": "이서연",
+  "email": "0817frog@gmail.com",
+  "password": "Test1234!",
+  "certificateCode": "1db5b075-8a3e-457e-8c1c-d5c0b831c5d2",
+  "adminKey": "asknd0enfdlvzn0a9wer2je09f8ashdnojff23g"
+}
+
+
+### 회원가입
+POST http://localhost:8080/users/signup
+Content-Type: application/json
+
+{
+  "name": "김윤재",
+  "email": "yooss135@naver.com",
+  "password": "Test1234!"
+}
+
+### 로그인
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+
+{
+  "email": "mmarland0@facebook.com",
+  "password": "Test1234!"
+}
+> {% client.global.set("user1Auth", response.headers.valueOf("Authorization")); %}
+
+### 로그아웃
+PUT http://localhost:8080/users/logout
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+
+### 회원탈퇴
+PUT http://localhost:8080/users/withdraw
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+{
+  "password": "Test1234!"
+}
+
+### 로그인한 유저 프로필 조회
+GET http://localhost:8081/users/profile
+Authorization: {{user1Auth}}
+
+
+### 프로필 수정
+PUT http://localhost:8081/users/profile
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+{
+  "name": "김윤재"
+}
+
+### 비밀번호 변경
+PUT http://localhost:8081/users/password
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+{
+  "currentPassword": "Test1234!",
+  "newPassword": "Test123!"
+}
+
+
+### 매니저 로그인
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "email": "mmarland0@facebook.com",
+  "password": "Test1234!"
+}
+> {%
+    client.global.set("manager1Auth", response.headers.valueOf("Authorization"));
+    client.global.set("manager1Refresh", response.headers.valueOf("RefreshToken"));
+%}
+
+
+### 관리자 로그인
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "email": "admin@joomla.org",
+  "password": "Test1234!"
+}
+> {% client.global.set("adminAuth", response.headers.valueOf("Authorization")); %}
+
+### 로그아웃
+PUT http://localhost:8080/users/logout
+Authorization: {{manager1Auth}}
+
+### 팔로우 요청
+DELETE http://localhost:8083/follow/stores/6
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+### 토큰 재발급
+POST http://localhost:8080/auth/reissue
+Authorization: {{manager1Auth}}
+RefreshToken: {{manager1Refresh}}
+

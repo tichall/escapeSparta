@@ -2,9 +2,15 @@ plugins {
     id 'java'
 }
 
-bootJar {enabled = false}
-jar{enabled = true}
+bootJar {
+    enabled = true
+    archiveFileName = 'escape-manager.jar' // 생성될 JAR 파일 이름 설정
+}
+jar{enabled = false}
 
 dependencies {
     implementation project(':escape-core')
+
+    // AWS
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.3.0'
 }

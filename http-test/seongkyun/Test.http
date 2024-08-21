@@ -1,0 +1,73 @@
+### 회원가입 요청
+POST http://localhost:8080/users/signup
+Content-Type: application/json
+
+{
+  "name": "박성균",
+  "email": "yooss135@naver.com",
+  "password": "Test1234!"
+}
+
+### 로그인 요청
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+
+{
+  "email": "yooss135@naver.com",
+  "password": "Test1234!"
+}
+> {% client.global.set("user1Auth", response.headers.valueOf("Authorization")); %}
+
+### 이메일 코드 발송
+POST http://localhost:8080/users/mail
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+### 이메일 인증 요청
+GET http://localhost:8080/users/mail
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+{
+  "verificationCode": "1234"
+}
+
+### 리뷰 작성
+POST http://localhost:8086/review
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+{
+  "reservationId": 2,
+  "title": "제목",
+  "contents": "내용",
+  "rating": 4.5
+}
+
+### 리뷰 수정
+PUT http://localhost:8086/review/1004
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+{
+  "title": "제목",
+  "contents": "내용",
+  "rating": 4.3
+}
+
+### 리뷰 삭제
+DELETE http://localhost:8086/review/1001
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+
+
+### 리액션 등록, 삭제
+POST http://localhost:8086/review/1004/reaction
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+{
+  "reactionType": "GOOD"
+}

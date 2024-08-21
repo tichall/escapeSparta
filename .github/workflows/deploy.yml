@@ -1,0 +1,167 @@
+name: Deploy Backend Modules
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+permissions: write-all
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Build each module
+      - name: Build escape-core
+        run: |
+          cd ../escapeSparta/escape-core
+          chmod +x ../gradlew
+          ../gradlew bootJar
+
+      - name: Build escape-search
+        run: |
+          cd ../escapeSparta/escape-search
+           chmod +x ../gradlew
+          ../gradlew bootJar
+
+      - name: Build escape-reservation
+        run: |
+          cd ../escapeSparta/escape-reservation
+          chmod +x ../gradlew
+          ../gradlew bootJar
+
+      - name: Build escape-manager
+        run: |
+          cd ../escapeSparta/escape-manager
+          chmod +x ../gradlew
+          ../gradlew bootJar
+
+      - name: Build escape-consumer
+        run: |
+          cd ../escapeSparta/escape-consumer
+          chmod +x ../gradlew
+          ../gradlew bootJar
+
+      - name: Build escape-admin
+        run: |
+          cd ../escapeSparta/escape-admin
+          chmod +x ../gradlew
+          ../gradlew bootJar
+
+      # Log in to Docker Hub
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_ID }}" --password-stdin
+
+      # Build and push Docker images for each module
+      - name: Build and push escape-core Docker image
+        run: |
+          cd ../escapeSparta/escape-core
+          docker build -t semmmi/escape-core:latest .
+          docker push semmmi/escape-core:latest
+
+      - name: Build and push escape-search Docker image
+        run: |
+          cd ../escapeSparta/escape-search
+          docker build -t semmmi/escape-search:latest .
+          docker push semmmi/escape-search:latest
+
+      - name: Build and push escape-reservation Docker image
+        run: |
+          cd ../escapeSparta/escape-reservation
+          docker build -t semmmi/escape-reservation:latest .
+          docker push semmmi/escape-reservation:latest
+
+      - name: Build and push escape-manager Docker image
+        run: |
+          cd ../escapeSparta/escape-manager
+          docker build -t semmmi/escape-manager:latest .
+          docker push semmmi/escape-manager:latest
+
+      - name: Build and push escape-consumer Docker image
+        run: |
+          cd ../escapeSparta/escape-consumer
+          docker build -t semmmi/escape-consumer:latest .
+          docker push semmmi/escape-consumer:latest
+
+      - name: Build and push escape-admin Docker image
+        run: |
+          cd ../escapeSparta/escape-admin
+          docker build -t semmmi/escape-admin:latest .
+          docker push semmmi/escape-admin:latest
+
+      - name: Copy docker-compose file via SSH
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }} # ec2 인스턴스 ip
+          username: ${{ secrets.EC2_USER }} # 로그인에 사용할 사용자 이름
+          key: ${{ secrets.EC2_KEY }}
+          source: "./docker-compose.yml" # 로컬 파일 시스템에서 복사할 파일 경로
+          target: "/home/ubuntu/app" # 원격에서 파일을 복사할 대상 경로
+          timeout: 600s
+
+      # Deploy to EC2
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /home/ubuntu/app
+            
+            # Remove existing .env file if it exists
+            if [ -f .env ]; then
+            echo "Removing existing .env file"
+            rm .env
+            fi
+            
+            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
+            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+            echo "KAFKA_HOST=${{ secrets.KAFKA_HOST }}" >> .env
+            echo "BOOTSTRAP_SERVER=${{ secrets.BOOTSTRAP_SERVER }}" >> .env
+            echo "GROUP_ID=${{ secrets.GROUP_ID }}" >> .env
+            echo "DATASOURCE_URL=${{ secrets.DATASOURCE_URL }}" >> .env
+            echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}" >> .env
+            echo "DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}" >> .env
+            echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> .env
+            echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
+            echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> .env
+            echo "DEFAULT_IMAGE_URL=${{ secrets.DEFAULT_IMAGE_URL }}" >> .env
+            echo "ACCESS_KEY=${{ secrets.ACCESS_KEY }}" >> .env
+            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+            echo "REGION=${{ secrets.REGION }}" >> .env
+            echo "PAY_ADMIN_KEY=${{ secrets.PAY_ADMIN_KEY }}" >> .env
+            echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
+            echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
+            echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> .env
+            echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> .env
+            echo "ROLE_EMAIL=${{ secrets.ROLE_EMAIL }}" >> .env
+            echo "ADMIN_KEY=${{ secrets.ADMIN_KEY }}" >> .env
+            echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
+            echo "CORE_SERVER_PORT=${{ secrets.CORE_SERVER_PORT }}" >> .env
+            echo "ADMIN_SERVER_PORT=${{ secrets.ADMIN_SERVER_PORT }}" >> .env
+            echo "MANAGER_SERVER_PORT=${{ secrets.MANAGER_SERVER_PORT }}" >> .env
+            echo "CONSUMER_SERVER_PORT=${{ secrets.CONSUMER_SERVER_PORT }}" >> .env
+            echo "RESERVATION_SERVER_PORT=${{ secrets.RESERVATION_SERVER_PORT }}" >> .env
+            echo "SEARCH_SERVER_PORT=${{ secrets.SEARCH_SERVER_PORT }}" >> .env
+            echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+            
+            ls -l .env
+            
+            docker-compose down
+            docker system prune -a
+            
+            docker-compose pull
+            docker-compose up -d
+

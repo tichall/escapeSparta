@@ -1,0 +1,20 @@
+### 방탈출 카페 등록 승인
+PUT http://localhost:8081/admin/stores/5/approval
+Authorization: {{adminAuth}}
+
+### 방탈출 테마 등록 -> postman에서 진행
+POST http://localhost:8081/manager/stores/themes
+Authorization: {{user1Auth}}
+Content-Type: application/json
+
+{
+  "storeId": 1,
+  "title": "title_51468600d511",
+  "contents": "contents_e6880a5a88ac",
+  "level": 3,
+  "duration": "09:00 ~ 20:00",
+  "minPlayer": 2,
+  "maxPlayer": 5,
+  "themeType": "MYSTERY",
+  "price": 10000
+}

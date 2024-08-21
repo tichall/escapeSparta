@@ -1,0 +1,9 @@
+### 테마 좋아요 등록
+POST http://localhost:8083/recommendation/theme/1
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+### 테마 좋아요 취소
+DELETE http://localhost:8083/recommendation/1
+Content-Type: application/json
+Authorization: {{user1Auth}}

@@ -1,0 +1,46 @@
+### 리뷰 작성
+POST http://localhost:8082/reviews
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+{
+  "reservationId": 49,
+  "title": "제목",
+  "contents": "내용",
+  "rating": 4.5
+}
+
+### 리뷰 수정
+PUT http://localhost:8082/reviews/1
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+{
+  "title": "제목111",
+  "contents": "내용",
+  "rating": 4.3
+}
+
+### 리뷰 삭제
+DELETE http://localhost:8082/reviews/4
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+### 리뷰 상세 조회
+GET http://localhost:8082/reviews/2
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+### 내가 쓴 리뷰 조회
+GET http://localhost:8082/mypage/reviews
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+### 리뷰 리액션 등록
+POST http://localhost:8082/reviews/3/reaction
+Content-Type: application/json
+Authorization: {{user1Auth}}
+
+{
+  "reactionType": "GOOD"
+}
